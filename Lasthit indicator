@@ -1,0 +1,34 @@
+-- Lasthit indicator script by Bluebloodedme
+
+local enemyMinions = nil
+
+function OnLoad()
+	enemyMinions = minionManager(MINION_ENEMY, 1500, myHero, MINION_SORT_HEALTH_ASC)
+	
+	createMenu()
+	
+	PrintChat("|> Lasthit indicator by Bluebloodedme - Have fun")
+end
+
+function createMenu()
+ConfigMenu = scriptConfig("DesperateMenu", "menu")
+	ConfigMenu:addSubMenu("Rendering", "render")
+		ConfigMenu.render:addParam("RLasthit", "Render Lasthit", SCRIPT_PARAM_ONOFF, false)
+	
+end
+
+function OnDraw() 
+	if ConfigMenu.render.RLasthit then DrawLastHit() end
+end
+
+function DrawLastHit()
+	enemyMinions:update()
+	for i, minion in pairs(enemyMinions.objects) do
+		if minion ~= nil and minion.health > 0 and (not minion.dead) and myHero:GetDistance(minion) < 1000 then
+			dmg = myHero:CalcDamage(minion, myHero.addDamage + myHero.damage)
+			if minion.health <= dmg then
+				DrawCircle3D(minion.x, minion.y, minion.z, 38, 2,  ARGB(100, 255, 255, 255), 6)
+			end
+		end
+	end
+end
